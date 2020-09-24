@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"path"
 	"path/filepath"
 	"sort"
 )
@@ -71,6 +72,26 @@ func check_test_exist(aryNotTest []string, aryIsTest []string) bool {
 	return bOK
 }
 
+func create_CruelTest4GoLang_sh(sPath string, aryIsTest []string) {
+	var sText = ""
+	for _, sName := range aryIsTest {
+		sText += "echo \" ./" + sName + "\"\r\n"
+	}
+	var sFileName = path.Join(sPath, "CruelTest4GoLang.sh")
+	fmt.Println(sFileName)
+
+	f, err := os.OpenFile(sFileName, os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0600)
+	if err != nil {
+		panic(err)
+	}
+
+	defer f.Close()
+
+	if _, err = f.WriteString(sText); err != nil {
+		panic(err)
+	}
+}
+
 func main() {
 	fmt.Println("Cruel Test for GoLang")
 	wd := getWorkingDirectory()
@@ -84,8 +105,9 @@ func main() {
 	aryNotTest, aryIsTest := split_test_and_not(files)
 
 	if check_test_exist(aryNotTest, aryIsTest) {
-		fmt.Println(aryNotTest)
-		fmt.Println(aryIsTest)
+		//fmt.Println(aryNotTest)
+		//fmt.Println(aryIsTest)
+		create_CruelTest4GoLang_sh(wd, aryIsTest)
 	} else {
 		os.Exit(1) // return non zero when error
 	}
